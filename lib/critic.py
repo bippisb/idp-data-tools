@@ -53,13 +53,13 @@ def get_similar_or_itself(name: str, candidates, **kwargs):
 
 # %%
 codebook_columns = ['variable name', 'variable description', 'variable type',
-                    'unit of measurement', 'constant unit/changing unit', 'formula',
+                    'unit of measurement', 'constant unit / changing unit', 'formula',
                     'unit reference', 'parent variable', 'unit conversion',
-                    'original/derived', 'variable parent', 'visual exclude']
+                    'original / derived', 'variable parent', 'visual exclude']
 variable_types = ["text", "numeric", "date", "region", "categorical"]
 metadata_fields = ["domain", "dataset name", "granularity level", "frequency", "source name", "source link", "data retrieval date",
                    "data last updated", "data extraction page", "about", "methodology", "resource", "data insights", "tags", "similar datasets"]
-additional_information_fields = ["years covered", "number og state(s)/union territories", "additional information",
+additional_information_fields = ["years covered", "number of state(s) / union territories", "additional information",
                                  "number of district(s)", "number of tehsil(s)", "number of gp", "number of villages"]
 # %%
 
