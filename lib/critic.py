@@ -7,6 +7,8 @@ from enum import Enum, auto
 from collections import namedtuple
 from typing import List
 import numpy as np
+from collections import OrderedDict
+from itertools import chain
 # %%
 
 
@@ -35,7 +37,11 @@ def contains_sheets(wb: pd.ExcelFile, sheet_names: List[str], strict=False):
     }
 # %%
 
-required_sheets = ["codebook", "metadata information", "additional information"]
+
+required_sheets = ["codebook",
+                   "metadata information", "additional information"]
+
+
 def has_required_sheets(wb: pd.ExcelFile, **kwargs):
     return all(contains_sheets(wb, sheet_names=required_sheets, **kwargs).values())
 # %%
@@ -106,11 +112,11 @@ def check_metadata_fields(s: pd.Series, fields=metadata_fields):
 
 # %%
 def parse_metadata(df: pd.DataFrame, fields=metadata_fields):
-    return {
+    return OrderedDict({
         field: df[1][df[0].str.strip().str.lower().apply(
             partial(get_similar, candidates=[field])).apply(bool)].apply(lambda v: v.strip() if type(v) == "str" else v).to_list()
         for field in fields
-    }
+    })
 # %%
 
 
@@ -131,12 +137,14 @@ def all_rows_have_values(column: pd.Series):
     crit = column.isna() | (column == "")
     return not (crit.any())
 # %%
-def ignore_sheet_title(df:pd.DataFrame, titles=set(required_sheets)):
-    key, value = df.iloc[0, :2].str.strip().str.lower().replace("", np.nan).to_list()
+
+
+def ignore_sheet_title(df: pd.DataFrame, titles=set(required_sheets)):
+    key, value = df.iloc[0, :2].str.strip(
+    ).str.lower().replace("", np.nan).to_list()
     if key in required_sheets and pd.isna(value):
         return df.iloc[1:]
     return df
-
 
 
 def critique_additional_information(df: pd.DataFrame, test_results: List[TestResult] = list()):
@@ -145,7 +153,8 @@ def critique_additional_information(df: pd.DataFrame, test_results: List[TestRes
             TestResult(TestResultType.ERROR, "Additional information sheet is should contain only two columns where the first column contains the field names and the second column contains their corresponding values."))
         return test_results, None
     df = ignore_sheet_title(df)
-    check_fields = check_metadata_fields(df[0], fields=additional_information_fields)
+    check_fields = check_metadata_fields(
+        df[0], fields=additional_information_fields)
     absent_fields = [key for key, value in check_fields.items()
                      if value == False]
     for field in absent_fields:
@@ -167,8 +176,8 @@ def critique_additional_information(df: pd.DataFrame, test_results: List[TestRes
             additional_information[field] = [pd.NA]
             continue
         additional_information[field] = [value_list[-1]]
-    
-    return test_results, pd.DataFrame(additional_information, index=["value"])
+
+    return test_results, pd.DataFrame({"key": additional_information.keys(), "value": list(chain(*additional_information.values()))})
 # %%
 
 
@@ -201,7 +210,7 @@ def critique_metadata(df: pd.DataFrame, test_results: List[TestResult] = list())
             continue
         metadata[field] = [value_list[0]]
 
-    return test_results, pd.DataFrame(metadata, index=["value"])
+    return test_results, pd.DataFrame({"key": metadata.keys(), "value": list(chain(*metadata.values()))})
 
 
 # %%
