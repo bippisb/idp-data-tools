@@ -1,8 +1,9 @@
 import streamlit as st
 import pandas as pd
-from lib.critic import critique_codebook, critique_sheets, critique_metadata
+from lib.critic import critique_codebook, critique_sheets, critique_metadata, critique_additional_information
 from lib.critic import TestResultType, TestResult
 from functools import partial
+from json import loads, dumps
 
 st.set_option('deprecation.showfileUploaderEncoding', False)
 
@@ -17,7 +18,7 @@ def show_test_result(result: TestResult):
         TestResultType.ERROR: partial(st.error, icon="🤷‍♀️"),
         TestResultType.SUCCESS: partial(st.success, icon="👌"),
         TestResultType.WARNING: partial(st.warning, icon="👨‍🏫"),
-        TestResultType.INFO: partial(st.info, icon="😇")
+        TestResultType.INFO: partial(st.info, icon="ℹ")
     }
     mapping[result.type](result.message)
 
@@ -42,5 +43,21 @@ if file is not None:
             results, metadata = critique_metadata(wb.parse("metadata information", header=None), test_results=list())
             st.write("## Metadata Information Sheet")
             list(map(show_test_result, results))
-            st.dataframe(metadata.T.fillna(pd.NA))
-
+            st.dataframe(metadata.T)
+            st.warning("Metadata values are not sanity checked. The critic is trusting your judgement.", icon="⚠")
+        
+        with st.spinner("Checking 'additional information' sheet"):
+            df = wb.parse("additional information", header=None)
+            results, extra_info = critique_additional_information(df, test_results=list())
+            st.write("## Additional Information Sheet")
+            list(map(show_test_result, results))
+            st.dataframe(extra_info.T)
+            st.warning("Additional Information values are not sanity checked. The critic is trusting your judgement.", icon="⚠")
+        
+        st.write("# Export Codebook")
+        json_codebook = dumps({
+            "additional information":loads(extra_info.to_json(orient="records")),
+            "metadata information": loads(metadata.to_json(orient="records")),
+            "codebook": loads(codebook.to_json(orient="records"))
+        })
+        st.download_button(label="Download as json", data=json_codebook, file_name=file.name.replace(".xlsx", ".json"), mime="application/json")

@@ -26,7 +26,7 @@ def contains_sheets(wb: pd.ExcelFile, sheet_names: List[str], strict=False):
     Checks whether the workbook contains the required sheets.
     """
     sheets = wb.sheet_names if strict else [
-        name.strip().lower().replace(" ", "_")
+        name.strip().lower()
         for name in wb.sheet_names
     ]
     return {
@@ -35,9 +35,9 @@ def contains_sheets(wb: pd.ExcelFile, sheet_names: List[str], strict=False):
     }
 # %%
 
-
+required_sheets = ["codebook", "metadata information", "additional information"]
 def has_required_sheets(wb: pd.ExcelFile, **kwargs):
-    return all(contains_sheets(wb, sheet_names=["codebook", "metadata_information", "additional_information"], **kwargs).values())
+    return all(contains_sheets(wb, sheet_names=required_sheets, **kwargs).values())
 # %%
 
 
@@ -59,6 +59,8 @@ codebook_columns = ['variable name', 'variable description', 'variable type',
 variable_types = ["text", "numeric", "date", "region", "categorical"]
 metadata_fields = ["domain", "dataset name", "granularity level", "frequency", "source name", "source link", "data retrieval date",
                    "data last updated", "data extraction page", "about", "methodology", "resource", "data insights", "tags", "similar datasets"]
+additional_information_fields = ["years covered", "number og state(s)/union territories", "additional information",
+                                 "number of district(s)", "number of tehsil(s)", "number of gp", "number of villages"]
 # %%
 
 
@@ -129,6 +131,45 @@ def all_rows_have_values(column: pd.Series):
     crit = column.isna() | (column == "")
     return not (crit.any())
 # %%
+def ignore_sheet_title(df:pd.DataFrame, titles=set(required_sheets)):
+    key, value = df.iloc[0, :2].str.strip().str.lower().replace("", np.nan).to_list()
+    if key in required_sheets and pd.isna(value):
+        return df.iloc[1:]
+    return df
+
+
+
+def critique_additional_information(df: pd.DataFrame, test_results: List[TestResult] = list()):
+    if df.ndim != 2:
+        test_results.append(
+            TestResult(TestResultType.ERROR, "Additional information sheet is should contain only two columns where the first column contains the field names and the second column contains their corresponding values."))
+        return test_results, None
+    df = ignore_sheet_title(df)
+    check_fields = check_metadata_fields(df[0], fields=additional_information_fields)
+    absent_fields = [key for key, value in check_fields.items()
+                     if value == False]
+    for field in absent_fields:
+        test_results.append(
+            TestResult(TestResultType.ERROR, f"Couldn't find '{field}' field."))
+    if len(absent_fields) == 0:
+        test_results.append(
+            TestResult(TestResultType.SUCCESS, f"All the required fields are present."))
+    additional_information = parse_metadata(df, fields=list(
+        set(additional_information_fields) - set(absent_fields)))
+
+    for field, value_list in additional_information.items():
+        if len(value_list) > 1:
+            test_results.append(
+                TestResult(TestResultType.WARNING, f"Multiple values found for '{field}' field."))
+        elif len(value_list) == 0 or pd.Series(value_list).replace("", np.nan).isna().any():
+            test_results.append(
+                TestResult(TestResultType.INFO, f"'{field}' field has no associated value."))
+            additional_information[field] = [pd.NA]
+            continue
+        additional_information[field] = [value_list[-1]]
+    
+    return test_results, pd.DataFrame(additional_information, index=["value"])
+# %%
 
 
 def critique_metadata(df: pd.DataFrame, test_results: List[TestResult] = list()):
@@ -160,7 +201,7 @@ def critique_metadata(df: pd.DataFrame, test_results: List[TestResult] = list())
             continue
         metadata[field] = [value_list[0]]
 
-    return test_results, pd.DataFrame(metadata)
+    return test_results, pd.DataFrame(metadata, index=["value"])
 
 
 # %%
