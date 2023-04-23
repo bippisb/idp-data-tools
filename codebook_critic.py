@@ -37,13 +37,13 @@ if file is not None:
                 wb.parse("codebook", header=None), test_results=list())
         st.write("## Codebook Sheet")
         list(map(show_test_result, results))
-        st.dataframe(codebook)
+        codebook = st.experimental_data_editor(codebook)
 
         with st.spinner("Checking 'metadata information' sheet"):
             results, metadata = critique_metadata(wb.parse("metadata information", header=None), test_results=list())
             st.write("## Metadata Information Sheet")
             list(map(show_test_result, results))
-            st.dataframe(metadata.T)
+            metadata = st.experimental_data_editor(metadata.T)
             st.warning("Metadata values are not sanity checked. The critic is trusting your judgement.", icon="⚠")
         
         with st.spinner("Checking 'additional information' sheet"):
@@ -51,7 +51,7 @@ if file is not None:
             results, extra_info = critique_additional_information(df, test_results=list())
             st.write("## Additional Information Sheet")
             list(map(show_test_result, results))
-            st.dataframe(extra_info.T)
+            extra_info = st.experimental_data_editor(extra_info.T)
             st.warning("Additional Information values are not sanity checked. The critic is trusting your judgement.", icon="⚠")
         
         st.write("# Export Codebook")
