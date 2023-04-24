@@ -146,7 +146,7 @@ def ignore_sheet_title(df: pd.DataFrame, titles=set(required_sheets)):
 
 
 def critique_additional_information(df: pd.DataFrame, test_results: List[TestResult] = list()):
-    if df.ndim != 2:
+    if df.shape[1] != 2:
         test_results.append(
             TestResult(TestResultType.ERROR, "Additional information sheet is should contain only two columns where the first column contains the field names and the second column contains their corresponding values."))
         return test_results, None
@@ -180,7 +180,7 @@ def critique_additional_information(df: pd.DataFrame, test_results: List[TestRes
 
 
 def critique_metadata(df: pd.DataFrame, test_results: List[TestResult] = list()):
-    if df.ndim != 2:
+    if df.shape[1] != 2:
         test_results.append(
             TestResult(TestResultType.ERROR, "Metadata sheet is should contain only two columns where the first column contains the field names and the second column contains their corresponding values."))
         return test_results, None
