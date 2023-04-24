@@ -90,6 +90,8 @@ def parse_codebook_headers(df: pd.DataFrame, titles_row: int, titles=codebook_co
     df = df.copy()
     df.columns = df.iloc[titles_row].str.lower().str.strip().apply(
         partial(get_similar_or_itself, candidates=titles))
+    for col in df.columns:
+        df[col] = df[col].str.strip()
     return df.iloc[titles_row+1:].reset_index(drop=True)
 # %%
 
