@@ -66,7 +66,7 @@ variable_types = ["text", "numeric", "date", "region", "categorical"]
 metadata_fields = ["domain", "dataset name", "granularity level", "frequency", "source name", "source link", "data retrieval date",
                    "data last updated", "data extraction page", "about", "methodology", "resource", "data insights", "tags", "similar datasets"]
 additional_information_fields = ["years covered", "number of state(s) / union territories", "additional information",
-                                 "number of district(s)", "number of tehsil(s)", "number of gp", "number of villages"]
+                                 "number of district(s)", "number of tehsil(s)", "number of gp", "number of villages", "number of indicators"]
 # %%
 
 
@@ -120,9 +120,7 @@ def parse_metadata(df: pd.DataFrame, fields=metadata_fields):
 # %%
 
 
-def has_invalid_variable_types(s: pd.Series):
-    valid_types = variable_types
-
+def has_invalid_variable_types(s: pd.Series, valid_types = variable_types):
     s = s.str.lower().str.strip()
     valid_crit = s.isin(valid_types)
     if valid_crit.all():
@@ -252,6 +250,7 @@ def critique_codebook(df: pd.DataFrame, test_results: List[TestResult] = list())
     else:
         test_results.append(
             TestResult(TestResultType.SUCCESS, f"All variable types are valid."))
+    codebook["variable type"] = codebook["variable type"].str.lower().str.strip().str.replace("categorical", "text").str.replace("region", "text")
 
     if "varaible name" in codebook.columns and not all_rows_have_values(codebook["variable name"]):
         test_results.append(
