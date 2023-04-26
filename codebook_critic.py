@@ -12,6 +12,12 @@ st.title('Codebook Critic')
 
 file = st.file_uploader("Choose an Excel file", type=["xlsx"])
 
+with open("./template/dataset_name_codebook.xlsx", "rb") as codebook_template:
+    st.download_button(
+        label="Download Codebook Template",
+        data = codebook_template.read(),
+        file_name="dataset_name_codebook.xlsx"
+    )
 
 def show_test_result(result: TestResult):
     mapping = {
@@ -61,3 +67,6 @@ if file is not None:
             "codebook": loads(codebook.to_json(orient="records"))
         })
         st.download_button(label="Download as json", data=json_codebook, file_name=file.name.replace(".xlsx", ".json"), mime="application/json")
+
+        with pd.ExcelWriter(file.name) as writer:
+            codebook.shift()
