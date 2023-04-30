@@ -145,6 +145,12 @@ def ignore_sheet_title(df: pd.DataFrame, titles=set(required_sheets)):
     if key in required_sheets and pd.isna(value):
         return df.iloc[1:]
     return df
+# %%
+
+
+def get_duplicate_values(column: pd.Series):
+    value_counts = column.value_counts()
+    return column[column.isin(value_counts[value_counts > 1].index)].unique().tolist()
 
 
 def critique_additional_information(df: pd.DataFrame, test_results: List[TestResult] = list()):
@@ -254,9 +260,17 @@ def critique_codebook(df: pd.DataFrame, test_results: List[TestResult] = list())
             TestResult(TestResultType.SUCCESS, f"All variable types are valid."))
     codebook["variable type"] = codebook["variable type"].str.lower().str.strip().str.replace("categorical", "text").str.replace("region", "text")
 
-    if "varaible name" in codebook.columns and not all_rows_have_values(codebook["variable name"]):
-        test_results.append(
-            TestResult(TestResultType.ERROR, f"Variable name cannot be empty. One of the rows in 'variable name' column contains an empty value."))
+    if "varaible name" in codebook.columns:
+        if all_rows_have_values(codebook["variable name"]):
+            test_results.append(
+                TestResult(TestResultType.ERROR, f"Variable name cannot be empty. One of the rows in 'variable name' column contains an empty value."))
+        duplicates = get_duplicate_values(codebook["variable name"])
+        if len(duplicates) > 0:
+            test_results.append(
+                TestResult(TestResultType.ERROR, f"""All variable names should be unique. Duplicates: '{"', '".join(set(duplicates))}'""")
+            )
+
+    
 
     if "variable description" in codebook.columns and not all_rows_have_values(codebook["variable description"]):
         test_results.append(
