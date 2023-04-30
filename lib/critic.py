@@ -149,8 +149,8 @@ def ignore_sheet_title(df: pd.DataFrame, titles=set(required_sheets)):
 
 
 def get_duplicate_values(column: pd.Series):
-    value_counts = column.value_counts()
-    return column[column.isin(value_counts[value_counts > 1].index)].unique().tolist()
+    value_counts = column.str.strip().value_counts()
+    return value_counts[value_counts > 1].index.unique().tolist()
 
 
 def critique_additional_information(df: pd.DataFrame, test_results: List[TestResult] = list()):
