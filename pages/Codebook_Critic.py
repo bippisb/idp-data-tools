@@ -15,9 +15,10 @@ file = st.file_uploader("Choose an Excel file", type=["xlsx"])
 with open("./template/dataset_name_codebook.xlsx", "rb") as codebook_template:
     st.download_button(
         label="Download Codebook Template",
-        data = codebook_template.read(),
+        data=codebook_template.read(),
         file_name="dataset_name_codebook.xlsx"
     )
+
 
 def show_test_result(result: TestResult):
     mapping = {
@@ -46,27 +47,34 @@ if file is not None:
         codebook = st.experimental_data_editor(codebook, num_rows="dynamic")
 
         with st.spinner("Checking 'metadata information' sheet"):
-            results, metadata = critique_metadata(wb.parse("metadata information", header=None), test_results=list())
+            results, metadata = critique_metadata(
+                wb.parse("metadata information", header=None), test_results=list())
             st.write("## Metadata Information Sheet")
             list(map(show_test_result, results))
-            metadata = st.experimental_data_editor(metadata, num_rows="dynamic")
-            st.warning("Metadata values are not sanity checked. The critic is trusting your judgement.", icon="⚠")
-        
+            metadata = st.experimental_data_editor(
+                metadata, num_rows="dynamic")
+            st.warning(
+                "Metadata values are not sanity checked. The critic is trusting your judgement.", icon="⚠")
+
         with st.spinner("Checking 'additional information' sheet"):
             df = wb.parse("additional information", header=None)
-            results, extra_info = critique_additional_information(df, test_results=list())
+            results, extra_info = critique_additional_information(
+                df, test_results=list())
             st.write("## Additional Information Sheet")
             list(map(show_test_result, results))
-            extra_info = st.experimental_data_editor(extra_info, num_rows="dynamic")
-            st.warning("Additional Information values are not sanity checked. The critic is trusting your judgement.", icon="⚠")
-        
+            extra_info = st.experimental_data_editor(
+                extra_info, num_rows="dynamic")
+            st.warning(
+                "Additional Information values are not sanity checked. The critic is trusting your judgement.", icon="⚠")
+
         st.write("# Export Codebook")
         json_codebook = dumps({
-            "additional information":loads(extra_info.to_json(orient="records")),
+            "additional information": loads(extra_info.to_json(orient="records")),
             "metadata information": loads(metadata.to_json(orient="records")),
             "codebook": loads(codebook.to_json(orient="records"))
         })
-        st.download_button(label="Download as json", data=json_codebook, file_name=file.name.replace(".xlsx", ".json"), mime="application/json")
+        st.download_button(label="Download as json", data=json_codebook,
+                           file_name=file.name.replace(".xlsx", ".json"), mime="application/json")
 
         with pd.ExcelWriter(file.name) as writer:
             codebook.shift()
