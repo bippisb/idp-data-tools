@@ -1,7 +1,7 @@
 import re
 from pydantic import BaseModel, validator
 from typing import Literal, Dict, List
-from typing_extensions import TypeAliasType
+
 
 def alphanumeric_name(string: str):
     return "".join(re.findall(r"[\w\d ]", string.strip().lower())).replace(" ", "_")
@@ -34,13 +34,13 @@ class Variable(BaseModel):
     description: str
     # postgres datatype
     data_type: PostgresDType
-    measurement_unit: str = None
-    formula: str = None
+    measurement_unit: str | None = None
+    formula: str | None = None
     # variable category (variable selection / parent variable)
-    category: str = None
-    unit_conversion: str = None
+    category: str | None = None
+    unit_conversion: str | None = None
     # variable parent (is used by some other variable)
-    dependent_variable: str = None
+    dependent_variable: str | None = None
     # original / derived
     is_derived: bool = False
     # changing unit / constant unit
@@ -78,8 +78,9 @@ Sectors = Literal[
     "Industries",
     "Natural Resources",
     "Rural Development",
-    "Socio Economic", 
+    "Socio Economic",
     "Youth Affairs",
+    "Other"
 ]
 
 GranularityLevel = Literal[
@@ -92,7 +93,7 @@ GranularityLevel = Literal[
     "Assembly Constituency",
     "Parliamentary Constituency",
     "Gram Panchayat",
-    "Market Center",
+    "Other",
 ]
 
 Frequency = Literal[
@@ -102,8 +103,10 @@ Frequency = Literal[
     "Monthly",
     "Quarterly",
     "Yearly",
-    "Quinquennially"
+    "Quinquennially",
+    "Other"
 ]
+
 
 class ResourceMetadata(BaseModel):
     # domains are referred to as sectors in ckan
@@ -130,17 +133,17 @@ class ResourceMetadata(BaseModel):
     # what insights does the dataset provide
     data_insights: str
     # SEO tags
-    tags: str
+    tags: List[str]
     # similar resources
-    similar_datasets: str
+    similar_datasets: List[str]
 
 
 class AdditionalInformation(BaseModel):
-    years_covered: str
-    notes: str
-    no_of_state: int
-    no_of_district: int
-    no_of_tehsil: int
-    no_of_village: int
-    no_of_gp: int
+    years_covered: str | None
+    notes: str | None
+    no_of_states: int | None
+    no_of_districts: int | None
+    no_of_tehsils: int | None
+    no_of_villages: int | None
+    no_of_gps: int | None
     no_of_indicators: int
