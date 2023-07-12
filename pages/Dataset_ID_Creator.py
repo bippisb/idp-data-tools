@@ -18,6 +18,7 @@ granularities = {
     "Assembly Constituency": "AC",
     "Parliamentary Constituency": "PC",
     "Other Level": "OL",
+    "Point Level": "PL",
 }
 granularity = st.selectbox(
     "What's the granularity of the dataset (Spatial Resolution)?",
@@ -25,15 +26,15 @@ granularity = st.selectbox(
 )
 
 frequencies = {
-    "Daily": "D",
-    "Weekly": "W",
-    "Fortnightly": "F",
-    "Monthly": "M",
-    "Quarterly": "Q",
-    "Yearly": "Y",
-    "Quinquennial": "Q",
-    "Decadal": "D",
-    "Other / One Time": "O",
+    "Daily": "DL",
+    "Weekly": "WK",
+    "Fortnightly": "FN",
+    "Monthly": "MN",
+    "Quarterly": "QT",
+    "Yearly": "YR",
+    "Quinquennial": "QQ",
+    "Decadal": "DC",
+    "Other / One Time": "OT",
 }
 
 frequency = st.selectbox(
