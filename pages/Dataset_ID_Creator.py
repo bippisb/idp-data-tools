@@ -31,6 +31,7 @@ frequencies = {
     "Fortnightly": "FN",
     "Monthly": "MN",
     "Quarterly": "QT",
+    "Seasonally": "SN",
     "Yearly": "YR",
     "Quinquennial": "QQ",
     "Decadal": "DC",
