@@ -5,6 +5,7 @@ import random
 st.header("Dataset ID Creator")
 
 granularities = {
+    "Country": "CN",
     "India": "IN",
     "State": "ST",
     "District": "DT",
