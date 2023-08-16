@@ -7,3 +7,4 @@ polars
 base64
 urllib.parse
 csv
+pandas
