@@ -4,3 +4,6 @@ openpyxl==3.1.2
 XlsxWriter==3.1.0
 pydantic
 polars
+base64
+urllib.parse
+csv
