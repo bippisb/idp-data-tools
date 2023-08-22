@@ -126,6 +126,11 @@ def main():
    
     # File upload
     uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
+
+    # File name for uploaded file
+    file_name = ""
+    if uploaded_file:
+        file_name = uploaded_file.name.split(".")[0]
     
     if uploaded_file is not None:
         data = pd.read_csv(uploaded_file)
@@ -214,12 +219,12 @@ def main():
         # Download updated dataset
         st.write("## Download Updated Dataset")
         if st.button("Download"):
-            updated_filename = "updated_dataset.csv"
+            updated_filename = f"{file_name}_updated.csv"
             data.to_csv(updated_filename, index=False, quoting=csv.QUOTE_ALL)
             st.markdown(get_download_link(updated_filename, "text/csv"), unsafe_allow_html=True)
             
             # Save DQA report to text file
-            dqa_filename = "data_quality_report.txt"
+            dqa_filename = f"{file_name}_data_quality_report.txt"
             with open(dqa_filename, "w") as f:
                 f.write(dqa_report)
             st.markdown(get_download_link(dqa_filename, "text/plain"), unsafe_allow_html=True)
