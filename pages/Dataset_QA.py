@@ -107,7 +107,7 @@ def process_column(data,col,special_char_counts, dqa_report, changes):
     if new_dtype != "No Change":
         try:
             if new_dtype == "date":
-                data[col] = data[col].apply(lambda date: convert_to_desired_format(date) if pd.notna(date) else None)
+                data[col] = data[col].astype(str).apply(lambda date: convert_to_desired_format(date) if pd.notna(date) else None)
                 changes[col] = f"Data Type Changed to {new_dtype} (Format: dd-mm-yyyy)"
                 st.write(f"###### Data Type Changed to {new_dtype} (Format: dd-mm-yyyy)")
             elif new_dtype == "int":
