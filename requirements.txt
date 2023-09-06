@@ -7,3 +7,4 @@ polars==0.18.15
 numpy==1.25.2
 urllib3==1.26.16
 pandas
+pyarrow

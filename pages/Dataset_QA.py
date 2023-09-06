@@ -133,6 +133,8 @@ def process_column(data,col,special_char_counts, dqa_report, changes):
             st.write(f"Special Character Values: {special_chars}")
     else:
         st.write("Count of Special Characters: 0")
+    
+    # drop column
 
 def main():
     """
@@ -146,13 +148,13 @@ def main():
     try:
         st.title("Dataset QA App")
         
-        uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
+        uploaded_file = st.file_uploader("Upload a data file", type=["csv", "parquet"])
 
         file_name = ""
         data = None
         if uploaded_file:
             file_name = uploaded_file.name.split(".")[0]
-            data = pd.read_csv(uploaded_file)
+            data = pd.read_parquet(uploaded_file) if uploaded_file.name.endswith(".parquet") else pd.read_csv(uploaded_file)
             
             st.write("## Dataset Preview")
             st.dataframe(data.head())
