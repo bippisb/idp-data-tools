@@ -4,7 +4,7 @@ import pandas as pd
 from pydantic import BaseModel, validator
 from lib.bipp.codebook.schema.types import PostgresDType
 import re
-from typing import List, Self
+from typing import List
 
 codebook_columns_v0 = [
     'variable name',
@@ -143,7 +143,7 @@ class Variable(BaseModel):
         return [Variable(**r) for r in records]
 
     @classmethod
-    def to_excel_codebook(cls, v: List[Self]):
+    def to_excel_codebook(cls, v: List):
         v = [i.dict() for i in v]
         def get_values(k): return [i[k] for i in v]
         def as_str(l): return [str(i) for i in l]

@@ -2,7 +2,6 @@ from typing import List
 import pandera as pa
 from pydantic import BaseModel
 import pandas as pd
-from typing import Self
 
 metadata_fields_v0 = [
     "domain",

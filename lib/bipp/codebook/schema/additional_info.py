@@ -1,7 +1,6 @@
 import pandera as pa
 from pydantic import BaseModel
 import pandas as pd
-from typing import Self
 
 additional_information_fields_v0 = [
     "years covered",
