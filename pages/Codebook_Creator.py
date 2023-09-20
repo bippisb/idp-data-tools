@@ -3,6 +3,7 @@ import polars as pl
 from lib.types import alphanumeric_name, polars_dtype_to_postgres_dtype_mapping
 from lib.types import Variable, ResourceMetadata, AdditionalInformation
 from lib.types import GranularityLevel, Sectors, Frequency
+from lib.bipp.codebook.export import to_excel_codebook
 from pydantic import ValidationError
 import json
 
@@ -127,5 +128,6 @@ if file is not None:
             "additional_information": additional_info.model_dump(),
             "metadata": metadata.model_dump(),
         }
-        st.download_button("Download Codebook", json.dumps(cb),
-                           file_name="dataset_sku_codebook.json")
+        excel = to_excel_codebook(cb=cb)
+        st.download_button("Download Codebook", excel,
+                           file_name="dataset_sku_codebook.xlsx")

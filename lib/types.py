@@ -62,25 +62,44 @@ class Variable(BaseModel):
 
 
 Sectors = Literal[
-    "Fisheries and Animal Husbandry",
-    "Agriculture",
-    "Culture and Tourism",
-    "Consumer Affairs",
-    "Communications",
-    "Economy",
-    "COVID-19",
-    "Education",
-    "Financial Inclusion",
-    "General",
-    "Health",
-    "Human Resource Development",
-    "Housing",
-    "Industries",
-    "Natural Resources",
-    "Rural Development",
-    "Socio Economic",
-    "Youth Affairs",
-    "Other"
+"Administration and Governance",
+"Animal Husbandry and Fisheries",
+"Banking",
+"Census",
+"Climate & Weather",
+"Commodity Boards",
+"Commerce",
+"Consumer Affairs",
+"Covid",
+"Crime",
+"Culture and Tourism",
+"Demographics",
+"Digital Infrastructure",
+"Economy",
+"Elections",
+"Energy",
+"External Affairs",
+"Financial Inclusion",
+"Food and Agriculture",
+"Forestry and Wildlife",
+"General",
+"Government Schemes",
+"Health",
+"Housing",
+"Industries",
+"Justice",
+"National Sample Survey",
+"Natural Disasters",
+"Other",
+"Petroleum and Gas",
+"Rural Development",
+"Satellite Imagery Data",
+"Science",
+"Socio Economic",
+"Transportation",
+"Union Budget",
+"Water",
+"Other"
 ]
 
 GranularityLevel = Literal[
@@ -104,7 +123,8 @@ Frequency = Literal[
     "Quarterly",
     "Yearly",
     "Quinquennially",
-    "Other"
+    "Other",
+    "Seasonal"
 ]
 
 
