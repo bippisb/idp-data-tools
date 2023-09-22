@@ -190,7 +190,6 @@ def main():
                 data.drop_duplicates(inplace=True)
                 st.success("Duplicate rows removed.")
                 changes["Duplicate Rows"] = "Duplicate rows were removed."
-
             # Summary statistics
             st.write("## Summary Statistics for Numerical Columns")
             numerical_columns = data.select_dtypes(include=["int64", "float64"]).columns
@@ -199,12 +198,26 @@ def main():
             dqa_report += generate_dqa_summary_statistics(summary_statistics)
 
             # Changes summary
-            dqa_report += generate_dqa_changes_summary(changes)
-
-            # After Update Preview
-            st.write("## Update Dataset Preview")
-            st.dataframe(data.head())
-            st.dataframe(data.tail())
+            # Check if there are any numeric columns
+            if data.select_dtypes(include=["int64", "float64"]).shape[1] > 0:
+                
+                # Summary statistics
+                st.write("## Summary Statistics for Numerical Columns")
+                numerical_columns = data.select_dtypes(include=["int64", "float64"]).columns
+                summary_statistics = data[numerical_columns].describe()
+                st.write(summary_statistics)
+                dqa_report += generate_dqa_summary_statistics(summary_statistics)
+            
+                # Changes summary
+                dqa_report += generate_dqa_changes_summary(changes)
+            
+                # After Update Preview
+                st.write("## Update Dataset Preview")
+                st.dataframe(data.head())
+                st.dataframe(data.tail())
+            
+            else:
+                st.write("No numeric columns found in the dataset.")
 
             # Download updated dataset
             st.write("## Download Updated Dataset")
@@ -218,7 +231,7 @@ def main():
                 with open(dqa_filename, "w") as f:
                     f.write(dqa_report)
                 st.markdown(get_download_link(dqa_filename, "text/plain"), unsafe_allow_html=True)
-                
+
     except Exception as e:
         st.error(f"An error occurred: {e}")
 
