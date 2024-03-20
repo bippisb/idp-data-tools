@@ -2,6 +2,7 @@ import pandera as pa
 from typing import Literal
 import pandas as pd
 from pydantic import BaseModel, validator
+from typing import Optional
 from lib.bipp.codebook.schema.types import PostgresDType
 import re
 from typing import List
@@ -109,13 +110,13 @@ class Variable(BaseModel):
     description: str
     # postgres datatype
     data_type: PostgresDType
-    measurement_unit: str | None = None
-    formula: str | None  = None
+    measurement_unit: Optional[str] = None
+    formula:  Optional[str] = None
     # variable category (variable selection / parent variable)
-    category: str | None  = None
-    unit_conversion: str | None  = None
+    category:  Optional[str] = None
+    unit_conversion:  Optional[str] = None
     # variable parent (is used by some other variable)
-    dependent_variable: str | None  = None
+    dependent_variable:  Optional[str] = None
     # original / derived
     is_derived: bool = False
     # changing unit / constant unit

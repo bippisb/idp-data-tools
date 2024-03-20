@@ -1,5 +1,6 @@
 import re
 from pydantic import BaseModel, validator
+from typing import Optional
 from typing import Literal, Dict, List
 
 
@@ -34,13 +35,13 @@ class Variable(BaseModel):
     description: str
     # postgres datatype
     data_type: PostgresDType
-    measurement_unit: str | None = None
-    formula: str | None = None
+    measurement_unit:  Optional[str] = None
+    formula:  Optional[str] = None
     # variable category (variable selection / parent variable)
-    category: str | None = None
-    unit_conversion: str | None = None
+    category:  Optional[str] = None
+    unit_conversion:  Optional[str] = None
     # variable parent (is used by some other variable)
-    dependent_variable: str | None = None
+    dependent_variable:  Optional[str] = None
     # original / derived
     is_derived: bool = False
     # changing unit / constant unit
