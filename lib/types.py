@@ -160,11 +160,11 @@ class ResourceMetadata(BaseModel):
 
 
 class AdditionalInformation(BaseModel):
-    years_covered: str | None
-    notes: str | None
-    no_of_states: int | None
-    no_of_districts: int | None
-    no_of_tehsils: int | None
-    no_of_villages: int | None
-    no_of_gps: int | None
+    years_covered: Optional[str] = None
+    notes: Optional[str] = None
+    no_of_states: Optional[int] = None
+    no_of_districts: Optional[int] = None
+    no_of_tehsils: Optional[int] = None
+    no_of_villages: Optional[int] = None
+    no_of_gps: Optional[int] = None
     no_of_indicators: int
