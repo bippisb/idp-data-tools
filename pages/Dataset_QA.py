@@ -5,14 +5,23 @@ import urllib.parse
 import csv
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
+import re
 
 def get_special_char_count(column):
+    # write docstring for this function
+    """
+    This function counts the number of special characters in a column
+    """
     if column.dtype == "object":
         special_chars = [char for char in column.unique() if not str(char).isalnum()]
         return special_chars
     return 0
 
 def generate_dqa_info(data, col, special_chars):
+    # write docstring for this function
+    """
+    This function generates the DQA information for a given column
+    """
     dqa_info = f"### Column: {col}\n"
     dqa_info += f"Data Type: {data[col].dtype}\n"
     dqa_info += f"Number of Numerical Values: {data[col].apply(pd.to_numeric, errors='coerce').notnull().sum()}\n"
@@ -27,6 +36,17 @@ def generate_dqa_info(data, col, special_chars):
     
     dqa_info += "\n"
     return dqa_info
+
+
+def clean_state_name_column(data, col):
+    try:
+        if 'state_name' in data.columns:
+            # Replace "&" with "and", remove special characters except spaces and alphabets, and trim spaces
+            data['state_name'] = data['state_name'].apply(lambda x: re.sub(r'[^a-zA-Z\s]', '', x.replace("&", "and")).strip())
+        return data
+    except Exception as e:
+        print(f"Error processing the file: {e}")
+        return None
 
 def generate_dqa_special_chars_info(col, special_chars):
     if special_chars:
@@ -90,6 +110,28 @@ def process_column(data,col,special_char_counts, dqa_report, changes):
     else:
         st.write(f"Unique Values: {data[col].unique()}")
     
+    if col == 'state_name':
+        has_special_chars = any(re.search(r"[^a-zA-Z0-9\s]", str(x)) for x in data[col])
+        if has_special_chars:
+            if st.button(f"Clean '{col}' Column"):
+                data[col] = data[col].apply(lambda x: re.sub(r'[&]', 'and', x))
+                data[col] = data[col].apply(lambda x: re.sub(r'[^a-zA-Z\s]', '', x).strip())
+                st.success(f"Cleaned special characters from '{col}' column.")
+    
+    if data[col].dtype in ['float64', 'float32']:
+        # For rounding decimal numbers
+        if any(data[col].apply(lambda x: len(str(x).split('.')[1]) > 2 if '.' in str(x) else False)):
+            if st.button(f"Round Off Decimal Numbers in {col}"):
+                data[col] = data[col].round(2)
+                st.success(f"Rounded off decimal numbers to 2 decimal places in {col}.")
+        
+    if data[col].dtype in ['int64', 'int32', 'float64', 'float32']:
+        has_negatives = (data[col] < 0).any()
+        if has_negatives:
+            if st.button(f"Convert Negative Numbers to Absolute in {col}"):
+                data[col] = data[col].abs()
+                st.success(f"Converted negative numbers to absolute values in {col}.")
+
     special_chars = special_char_counts[col]
 
     # Perform other specific operations on the column data
