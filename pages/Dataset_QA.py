@@ -117,6 +117,7 @@ def process_column(data,col,special_char_counts, dqa_report, changes):
                 data[col] = data[col].apply(lambda x: re.sub(r'[&]', 'and', x))
                 data[col] = data[col].apply(lambda x: re.sub(r'[^a-zA-Z\s]', '', x).strip())
                 st.success(f"Cleaned special characters from '{col}' column.")
+                special_chars = special_char_counts[col]
     
     if data[col].dtype in ['float64', 'float32']:
         # For rounding decimal numbers
@@ -175,6 +176,8 @@ def process_column(data,col,special_char_counts, dqa_report, changes):
             st.write(f"Special Character Values: {special_chars}")
     else:
         st.write("Count of Special Characters: 0")
+    # return data
+    return data
     
     # drop column
 
@@ -188,22 +191,39 @@ def main():
     """
     st.set_page_config(page_title="Dataset QA")
     try:
+            # Check if 'data' and 'data_loaded' flags exist in session state, initialize if not
+        if 'data_loaded' not in st.session_state:
+            st.session_state.data_loaded = False
+        if 'data' not in st.session_state:
+            st.session_state.data = pd.DataFrame()
+
         st.title("Dataset QA App")
         
         uploaded_file = st.file_uploader("Upload a data file", type=["csv", "parquet"])
 
         file_name = ""
         data = None
+        if 'data' not in st.session_state:
+            st.session_state.data = pd.DataFrame()  # Initializes an empty DataFrame or loads initial data
         if uploaded_file:
             file_name = uploaded_file.name.split(".")[0]
-            data = pd.read_parquet(uploaded_file) if uploaded_file.name.endswith(".parquet") else pd.read_csv(uploaded_file)
+            # Load the data only if it hasn't been loaded before or a new file is uploaded
+            if not st.session_state.data_loaded or st.session_state.uploaded_file_name != file_name:
+                st.session_state.data = pd.read_parquet(uploaded_file) if uploaded_file.name.endswith(".parquet") else pd.read_csv(uploaded_file)
+                st.session_state.data_loaded = True
+                st.session_state.uploaded_file_name = file_name  # Keep track of the loaded file name
+
+        if not st.session_state.data.empty:
+            # Proceed with displaying and processing the DataFrame
+            st.write("## Dataset Preview")
+            st.dataframe(st.session_state.data.head())
             
             st.write("## Dataset Preview")
-            st.dataframe(data.head())
+            st.dataframe(st.session_state.data.head())
             
             st.write("## Dataset Information")
-            st.write(f"Number of Rows: {data.shape[0]}")
-            st.write(f"Number of Columns: {data.shape[1]}")
+            st.write(f"Number of Rows: {st.session_state.data.shape[0]}")
+            st.write(f"Number of Columns: {st.session_state.data.shape[1]}")
             
             st.write("## Column Information")
             changes = {}
@@ -212,16 +232,16 @@ def main():
             
             # Parallel Processing for special character counts
             with ThreadPoolExecutor(max_workers=4) as executor:
-                special_char_counts = {col: get_special_char_count(data[col]) for col in data.columns}
+                special_char_counts = {col: get_special_char_count(st.session_state.data[col]) for col in st.session_state.data.columns}
 
-            for col in data.columns:
-                process_column(data, col, special_char_counts, dqa_report, changes)
+            for col in st.session_state.data.columns:
+                st.session_state.data = process_column(st.session_state.data, col, special_char_counts, dqa_report, changes)
                 special_chars = special_char_counts[col]
-                dqa_report += generate_dqa_info(data, col, special_chars)
+                dqa_report += generate_dqa_info(st.session_state.data, col, special_chars)
                 st.write("---")
 
             # Number of duplicate rows
-            duplicate_count = data.duplicated().sum()
+            duplicate_count = st.session_state.data.duplicated().sum()
             st.write("## Number of Duplicate Rows")
             st.write(f"Number of Duplicate Rows: {duplicate_count}")
 
@@ -234,38 +254,37 @@ def main():
                 changes["Duplicate Rows"] = "Duplicate rows were removed."
             # Summary statistics
             st.write("## Summary Statistics for Numerical Columns")
-            numerical_columns = data.select_dtypes(include=["int64", "float64"]).columns
-            summary_statistics = data[numerical_columns].describe()
+            numerical_columns = st.session_state.data.select_dtypes(include=["int64", "float64"]).columns
+            summary_statistics = st.session_state.data[numerical_columns].describe()
             st.write(summary_statistics)
             dqa_report += generate_dqa_summary_statistics(summary_statistics)
 
             # Changes summary
             # Check if there are any numeric columns
-            if data.select_dtypes(include=["int64", "float64"]).shape[1] > 0:
+            if st.session_state.data.select_dtypes(include=["int64", "float64"]).shape[1] > 0:
                 
                 # Summary statistics
                 st.write("## Summary Statistics for Numerical Columns")
-                numerical_columns = data.select_dtypes(include=["int64", "float64"]).columns
-                summary_statistics = data[numerical_columns].describe()
+                numerical_columns = st.session_state.data.select_dtypes(include=["int64", "float64"]).columns
+                summary_statistics = st.session_state.data[numerical_columns].describe()
                 st.write(summary_statistics)
                 dqa_report += generate_dqa_summary_statistics(summary_statistics)
             
                 # Changes summary
-                dqa_report += generate_dqa_changes_summary(changes)
-            
-                # After Update Preview
-                st.write("## Update Dataset Preview")
-                st.dataframe(data.head())
-                st.dataframe(data.tail())
-            
+                dqa_report += generate_dqa_changes_summary(changes)            
             else:
                 st.write("No numeric columns found in the dataset.")
+            
+            # After Update Preview
+            st.write("## Update Dataset Preview")
+            st.dataframe(st.session_state.data.head())
+            st.dataframe(st.session_state.data.tail())
 
             # Download updated dataset
             st.write("## Download Updated Dataset")
             if st.button("Download"):
                 updated_filename = f"{file_name}_updated.csv"
-                data.to_csv(updated_filename, index=False, quoting=csv.QUOTE_ALL)
+                st.session_state.data.to_csv(updated_filename, index=False, quoting=csv.QUOTE_ALL)
                 st.markdown(get_download_link(updated_filename, "text/csv"), unsafe_allow_html=True)
                 
                 # Save DQA report to text file
