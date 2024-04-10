@@ -125,6 +125,15 @@ def process_column(data,col,special_char_counts, dqa_report, changes):
             if st.button(f"Round Off Decimal Numbers in {col}"):
                 data[col] = data[col].round(2)
                 st.success(f"Rounded off decimal numbers to 2 decimal places in {col}.")
+    
+    if data[col].dtype in ['object', 'str']:
+        # Check if any value is not already in title case
+        if not all(data[col].apply(lambda x: x.istitle() if isinstance(x, str) else True)):
+            if st.button(f"Convert {col} to Title Case"):
+                data[col] = data[col].apply(lambda x: x.title() if isinstance(x, str) and not x.istitle() else x)
+                st.success(f"Converted {col} to title case.")
+        else:
+            st.write(f"The values in column '{col}' are already in title case.")
         
     if data[col].dtype in ['int64', 'int32', 'float64', 'float32']:
         has_negatives = (data[col] < 0).any()
