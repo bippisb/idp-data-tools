@@ -9,4 +9,3 @@ urllib3==1.26.16
 pandas
 pyarrow
 pandera
-re
