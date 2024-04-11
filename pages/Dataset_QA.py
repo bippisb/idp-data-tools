@@ -98,7 +98,7 @@ def convert_to_desired_format(date_str):
         return "Error: " + str(e)
 
 
-def process_column(data,col,special_char_counts, dqa_report, changes):
+def process_column(data,col,special_char_counts, dqa_report, changes, state_lgd_data, district_lgd_data):
     # Process each column
     st.write(f"### Column: {col}")
     st.write(f"Data Type: {data[col].dtype}")
@@ -141,6 +141,63 @@ def process_column(data,col,special_char_counts, dqa_report, changes):
             if st.button(f"Convert Negative Numbers to Absolute in {col}"):
                 data[col] = data[col].abs()
                 st.success(f"Converted negative numbers to absolute values in {col}.")
+    
+    # if col == 'state_name':
+    #     if not state_lgd_data.empty:
+    #         # Create a button to replace state names
+    #         for index, row in data.iterrows():
+    #             state_code = row['state_code']
+    #             state_name = row['state_name']
+
+    #             # Find matching state_code in state_lgd_data
+    #             matching_state = state_lgd_data[state_lgd_data['state_lgd_code'] == state_code]
+
+    #             # If matching state is found and state_name is different, replace state_name
+    #             if not matching_state.empty and matching_state.iloc[0]['state_name'] != state_name:
+    #                 button_key = f"replace_state_button_{state_code}"  # Unique key based on state_code
+    #                 if st.button(f"Replace '{state_name}' with '{matching_state.iloc[0]['state_name']}' in state_name column", key=button_key):
+    #                     data.at[index, 'state_name'] = matching_state.iloc[0]['state_name']
+    #                     changes['state_name'] = f"State names replaced based on state_lgd.csv data."
+    #                     st.success(f"Replaced '{state_name}' with '{matching_state.iloc[0]['state_name']}' in state_name column.")
+    # Get unique pairs of state_code and state_name
+    unique_state_pairs = data[['state_code', 'state_name']].drop_duplicates()
+
+    if col == 'state_name' :
+        # Iterate over unique pairs to create buttons
+        for index, row in unique_state_pairs.iterrows():
+            state_code = str(row['state_code'])
+            state_name = row['state_name']
+            # find matching state_code in state_lgd_data
+            matching_state = state_lgd_data[state_lgd_data['state_lgd_code'] == state_code]
+
+            # if matching state is found and state_name is different, replace state_name
+            if not matching_state.empty and matching_state.iloc[0]['state_name'] != state_name:
+                button_key = f"replace_state_button_{state_code}"  # Unique key based on state_code
+                if st.button(f"Replace '{state_name}' with '{matching_state.iloc[0]['state_name']}' in state_name column", key=button_key):
+                    data.at[index, 'state_name'] = matching_state.iloc[0]['state_name']
+                    changes['state_name'] = f"State names replaced based on state_lgd.csv data."
+                    st.success(f"Replaced '{state_name}' with '{matching_state.iloc[0]['state_name']}' in state_name column.")
+
+
+    if "district_name" in data.columns and "district_code" in data.columns:
+        if not district_lgd_data.empty:
+            # Iterate over rows and replace district_name if necessary
+            if st.button("Replace District Names"):
+                for index, row in data.iterrows():
+                    district_code = row['district_code']
+                    district_name = row['district_name']
+
+                    # Find matching district_code in district_lgd_data
+                    matching_district = district_lgd_data[district_lgd_data['district_lgd_code'] == district_code]
+
+                    # If matching district is found and district_name is different, replace district_name
+                    if not matching_district.empty and matching_district.iloc[0]['district_name'] != district_name:
+                            # unique key based on district_code
+                            button_key = f"replace_district_button_{district_code}"  # Unique key based on district_code
+                            if st.button(f"Replace '{district_name}' with '{matching_district.iloc[0]['district_name']}' in '{col}'", key=button_key):
+                                data.at[index, 'district_name'] = matching_district.iloc[0]['district_name']
+                                changes['district_name'] = f"District names replaced based on district_lgd.csv data."
+                                st.success(f"Replaced '{district_name}' with '{matching_district.iloc[0]['district_name']}' in '{col}'.")
 
     special_chars = special_char_counts[col]
 
@@ -233,6 +290,13 @@ def main():
             st.write("## Dataset Information")
             st.write(f"Number of Rows: {st.session_state.data.shape[0]}")
             st.write(f"Number of Columns: {st.session_state.data.shape[1]}")
+
+            # read state_lgd_data and district_lgd_data
+            state_lgd_data = pd.read_csv("/Users/surya/Codespace/idp-data-tools/state_lgd.csv")
+            district_lgd_data = pd.read_csv("/Users/surya/Codespace/idp-data-tools/district_lgd.csv")
+
+            state_lgd_data['state_lgd_code'] = state_lgd_data['state_lgd_code'].astype(str)
+            district_lgd_data['district_lgd_code'] = district_lgd_data['district_lgd_code'].astype(str)
             
             st.write("## Column Information")
             changes = {}
@@ -244,7 +308,7 @@ def main():
                 special_char_counts = {col: get_special_char_count(st.session_state.data[col]) for col in st.session_state.data.columns}
 
             for col in st.session_state.data.columns:
-                st.session_state.data = process_column(st.session_state.data, col, special_char_counts, dqa_report, changes)
+                st.session_state.data = process_column(st.session_state.data, col, special_char_counts, dqa_report, changes, state_lgd_data, district_lgd_data)
                 special_chars = special_char_counts[col]
                 dqa_report += generate_dqa_info(st.session_state.data, col, special_chars)
                 st.write("---")
