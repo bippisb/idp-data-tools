@@ -292,8 +292,10 @@ def main():
             st.write(f"Number of Columns: {st.session_state.data.shape[1]}")
 
             # read state_lgd_data and district_lgd_data
-            state_lgd_data = pd.read_csv("/Users/surya/Codespace/idp-data-tools/state_lgd.csv")
-            district_lgd_data = pd.read_csv("/Users/surya/Codespace/idp-data-tools/district_lgd.csv")
+            # modify the file path accordingly
+
+            state_lgd_data = pd.read_csv("https://raw.githubusercontent.com/Suryakandukuri/idp-data-tools/master/state_lgd.csv")
+            district_lgd_data = pd.read_csv("https://raw.githubusercontent.com/Suryakandukuri/idp-data-tools/master/district_lgd.csv")
 
             state_lgd_data['state_lgd_code'] = state_lgd_data['state_lgd_code'].astype(str)
             district_lgd_data['district_lgd_code'] = district_lgd_data['district_lgd_code'].astype(str)
