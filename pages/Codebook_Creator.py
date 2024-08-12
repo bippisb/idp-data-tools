@@ -68,11 +68,13 @@ if file is not None:
     data_last_updated = st.date_input(
         "When was the data last updated on source?")
     about = st.text_area(
-        "Provide a description for the dataset. It will show up as resource description on the data portal.", height=5)
+        "Provide a description for the resource. It will show up as resource description on the data portal.", height=5)
     data_insights = st.text_area(
         "What are the insights that can be gained from the dataset?")
     seo_tags = st.text_input(
         "SEO tags: multiple tags can be separated by comma.")
+    package_description = st.text_area(
+        "Provide a description for the package. It will show up as package description on the data portal.", height=5)
 
     st.write("## Additional Information")
     st.write("#### Dataset Description")
@@ -110,7 +112,8 @@ if file is not None:
             data_insights=data_insights,
             resource=resource_name,
             tags=seo_tags.split(","),
-            similar_datasets=[]
+            similar_datasets=[],
+            package_description=package_description
         )
 
         additional_info = AdditionalInformation(
