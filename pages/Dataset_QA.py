@@ -142,25 +142,10 @@ def process_column(data,col,special_char_counts, dqa_report, changes, state_lgd_
                 data[col] = data[col].abs()
                 st.success(f"Converted negative numbers to absolute values in {col}.")
     
-    # if col == 'state_name':
-    #     if not state_lgd_data.empty:
-    #         # Create a button to replace state names
-    #         for index, row in data.iterrows():
-    #             state_code = row['state_code']
-    #             state_name = row['state_name']
-
-    #             # Find matching state_code in state_lgd_data
-    #             matching_state = state_lgd_data[state_lgd_data['state_lgd_code'] == state_code]
-
-    #             # If matching state is found and state_name is different, replace state_name
-    #             if not matching_state.empty and matching_state.iloc[0]['state_name'] != state_name:
-    #                 button_key = f"replace_state_button_{state_code}"  # Unique key based on state_code
-    #                 if st.button(f"Replace '{state_name}' with '{matching_state.iloc[0]['state_name']}' in state_name column", key=button_key):
-    #                     data.at[index, 'state_name'] = matching_state.iloc[0]['state_name']
-    #                     changes['state_name'] = f"State names replaced based on state_lgd.csv data."
-    #                     st.success(f"Replaced '{state_name}' with '{matching_state.iloc[0]['state_name']}' in state_name column.")
     # Get unique pairs of state_code and state_name
-    unique_state_pairs = data[['state_code', 'state_name']].drop_duplicates()
+    # if state_name or state_code column exists in data
+    if 'state_code' in data.columns and 'state_name' in data.columns:
+        unique_state_pairs = data[['state_code', 'state_name']].drop_duplicates()
 
     if col == 'state_name' :
         # Iterate over unique pairs to create buttons
@@ -174,6 +159,8 @@ def process_column(data,col,special_char_counts, dqa_report, changes, state_lgd_
             if not matching_state.empty and matching_state.iloc[0]['state_name'] != state_name:
                 button_key = f"replace_state_button_{state_code}"  # Unique key based on state_code
                 if st.button(f"Replace '{state_name}' with '{matching_state.iloc[0]['state_name']}' in state_name column", key=button_key):
+                    # Replace state_name in data
+                    data['state_name'] = data['state_name'].apply(lambda x: matching_state.iloc[0]['state_name'] if x==state_name else x)
                     data.at[index, 'state_name'] = matching_state.iloc[0]['state_name']
                     changes['state_name'] = f"State names replaced based on state_lgd.csv data."
                     st.success(f"Replaced '{state_name}' with '{matching_state.iloc[0]['state_name']}' in state_name column.")
@@ -324,7 +311,7 @@ def main():
 
             # Remove duplicate rows
             if st.button("Remove Duplicate Rows"):
-                data.drop_duplicates(inplace=True)
+                st.session_state.data.drop_duplicates(inplace=True)
                 st.success("Duplicate rows removed.")
                 changes["Duplicate Rows"] = "Duplicate rows were removed."
             # Summary statistics
