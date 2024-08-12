@@ -24,7 +24,7 @@ def codebook_openpyxl(codebook: Workbook):
 
 def metadata_openpyxl(metadata: Workbook):
     sheet = metadata.get_sheet_by_name('metadata information')
-    if sheet['A1'] == 'Metadata information' and sheet['A2'] == 'Domain' and sheet['A3'] == 'Dataset name' and sheet['A4'] == 'Granularity level' and sheet['A5'] == 'Frequency' and sheet['A6'] == 'Source name' and sheet['A7'] == 'Source link' and sheet['A8'] == 'Data retrieval date' and sheet['A9'] == 'Data last updated' and sheet['A10'] == 'Data extraction page' and sheet['A11'] == 'About' and sheet['A12'] == 'Methodology' and sheet['A13'] == 'Resource':
+    if sheet['A1'] == 'Metadata information' and sheet['A2'] == 'Domain' and sheet['A3'] == 'Dataset name' and sheet['A4'] == 'Granularity level' and sheet['A5'] == 'Frequency' and sheet['A6'] == 'Source name' and sheet['A7'] == 'Source link' and sheet['A8'] == 'Data retrieval date' and sheet['A9'] == 'Data last updated' and sheet['A10'] == 'Data extraction page' and sheet['A11'] == 'About' and sheet['A12'] == 'Methodology' and sheet['A13'] == 'Resource' and sheet['A14'] == 'Data Insights' and sheet['A15'] == 'Tags' and sheet['A16'] == 'Similar Datasets' and sheet['A17'] == 'Package Description':
         print('columns are correct')
     else:
         sheet['A1'] = 'Metadata information'
@@ -40,6 +40,10 @@ def metadata_openpyxl(metadata: Workbook):
         sheet['A11'] = 'About'
         sheet['A12'] = 'Methodology'
         sheet['A13'] = 'Resource'
+        sheet['A14'] = 'Data Insights'
+        sheet['A15'] = 'Tags'
+        sheet['A16'] = 'Similar Datasets'
+        sheet['A17'] = 'Package Description'
         print('replaced coloumns')
     return metadata
 
