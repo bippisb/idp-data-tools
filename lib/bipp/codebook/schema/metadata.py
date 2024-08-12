@@ -19,6 +19,7 @@ metadata_fields_v0 = [
     "data insights",
     "tags",
     "similar datasets",
+    "package description"
 ]
 
 MetadataSchemaV0 = pa.DataFrameSchema({
@@ -37,6 +38,7 @@ MetadataSchemaV0 = pa.DataFrameSchema({
     "data insights": pa.Column(str, nullable=True),
     "tags": pa.Column(str),
     "similar datasets": pa.Column(str, nullable=True),
+    "package description":pa.Column(str, nullable=True)
 }, strict="filter")
 
 
@@ -68,6 +70,8 @@ class ResourceMetadata(BaseModel):
     tags: List[str]
     # similar resources
     similar_datasets: List[str]
+    # package description
+    package_description: str
 
     @classmethod
     @pa.check_input(MetadataSchemaV0)
