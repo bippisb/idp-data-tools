@@ -157,6 +157,8 @@ class ResourceMetadata(BaseModel):
     tags: List[str]
     # similar resources
     similar_datasets: List[str]
+    # package description
+    package_description: str
 
 
 class AdditionalInformation(BaseModel):
