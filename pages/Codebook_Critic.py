@@ -5,7 +5,7 @@ from lib.critic import TestResultType, TestResult
 from functools import partial
 from json import loads, dumps
 
-st.set_option('deprecation.showfileUploaderEncoding', False)
+# st.set_option('deprecation.showfileUploaderEncoding', False)
 
 st.set_page_config(page_title="Codebook Critic")
 st.title('Codebook Critic')
