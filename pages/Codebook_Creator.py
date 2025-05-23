@@ -34,7 +34,7 @@ if file is not None:
 
     st.write("## Data Dictionary")
     st.write("For a start variable descriptions are same as variable names. Please edit varaible descriptions.")
-    edited_data_dict = st.experimental_data_editor(
+    edited_data_dict = st.data_editor(
         pl.from_records([var.model_dump() for var in data_dict]).to_pandas()
     )
     if st.button("Validate Data Dictionary"):
@@ -68,13 +68,13 @@ if file is not None:
     data_last_updated = st.date_input(
         "When was the data last updated on source?")
     about = st.text_area(
-        "Provide a description for the resource. It will show up as resource description on the data portal.", height=5)
+        "Provide a description for the resource. It will show up as resource description on the data portal.")
     data_insights = st.text_area(
         "What are the insights that can be gained from the dataset?")
     seo_tags = st.text_input(
         "SEO tags: multiple tags can be separated by comma.")
     package_description = st.text_area(
-        "Provide a description for the package. It will show up as package description on the data portal.", height=5)
+        "Provide a description for the package. It will show up as package description on the data portal.")
 
     st.write("## Additional Information")
     st.write("#### Dataset Description")
@@ -91,7 +91,7 @@ if file is not None:
     no_of_gps = st.number_input(
         "Number of *gram panchayats* covered by the dataset.", step=1)
     no_of_villages = st.number_input(
-        "Number of *villages* covered by the dataset.", step=1)
+        "Number of *villages* covered by the dataset.", step=1)  
     notes = st.text_area(
         "Any notes or remarks for the end users of this dataset.")
     no_of_indicators = df.select(pl.col(pl.NUMERIC_DTYPES)).shape[1]
@@ -131,6 +131,7 @@ if file is not None:
             "additional_information": additional_info.model_dump(),
             "metadata": metadata.model_dump(),
         }
+        
         excel = to_excel_codebook(cb=cb)
         st.download_button("Download Codebook", excel,
-                           file_name="dataset_sku_codebook.xlsx")
+                           file_name=f"{resource_name.lower().replace(' ', '_')}_codebook.xlsx")
