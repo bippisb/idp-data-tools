@@ -114,6 +114,7 @@ GranularityLevel = Literal[
     "Parliamentary Constituency",
     "Gram Panchayat",
     "Other",
+    "Point"
 ]
 
 Frequency = Literal[
