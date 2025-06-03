@@ -94,6 +94,7 @@ if file is not None:
         "Number of *villages* covered by the dataset.", step=1)  
     notes = st.text_area(
         "Any notes or remarks for the end users of this dataset.")
+
     no_of_indicators = st.number_input(
         "Number of *indicators* in the dataset.", step=1)
 
